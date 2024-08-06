@@ -4,6 +4,10 @@ SURVEY_PASSWORD = 'myP@ssw0rd1234'
 cwd = os.getcwd()
 TEMPLATE_PATH = os.path.join(cwd, 'Survey_Template.docx')
 
+# Create Generated_Surveys folder if not created yet
+if not os.path.exists(os.path.join(cwd, 'Generated_Surveys')):
+    os.mkdir(os.path.join(cwd, 'Generated_Surveys'))
+
 def add_basic_info(word: win32com.client, doc_path: str, basic_info: dict):
     # Open template document
     doc = word.Documents.Open(TEMPLATE_PATH)
@@ -59,10 +63,17 @@ def main():
     word = win32com.client.Dispatch('Word.Application')
     word.Visible = False
 
+    no_processed = 0
+    total = len(data)
+
+    print(f'Current Progress: {no_processed:03} / {total:03} | {(no_processed * 100 / total):.3}% Completed')
+
     for item in data:
         filename = f'{item["company"]}_{item["name"]}.docx'
         file_path = os.path.join(cwd, 'Generated_Surveys', filename)
         add_basic_info(word, file_path, item)
+        no_processed += 1
+        print(f'Current Progress: {no_processed:03} / {total:03} | {(no_processed * 100 / total):.3}% Completed')
 
     # Close MS Word
     word.Quit()
